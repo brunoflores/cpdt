@@ -17,3 +17,9 @@ Definition binopDenote (b : binop) : nat -> nat -> nat :=
   | Plus => plus
   | Times => mult
   end.
+
+Fixpoint expDenote (e : exp) : nat :=
+  match e with
+  | Const n => n
+  | Binop b e1 e2 => (binopDenote b) (expDenote e1) (expDenote e2)
+  end.
