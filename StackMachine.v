@@ -63,3 +63,23 @@ Fixpoint progDenote (p : prog) (s : stack) : option stack :=
     | Some s' => progDenote p' s'
     end
   end.
+
+(* ---------- Compiler definition ------------- *)
+
+(* Translation. *)
+
+Fixpoint compile (e : exp) : prog :=
+  match e with
+  | Const n => iConst n :: nil
+  | Binop b e1 e2 => compile e2 ++ compile e1 ++ iBinop b :: nil
+  end.
+
+Eval simpl in compile (Const 42).
+Eval simpl in compile (Binop Plus (Const 2) (Const 2)).
+Eval simpl in compile (Binop Times (Binop Plus (Const 2) (Const 2)) (Const 7)).
+
+(* Run some compiled programs. *)
+
+Eval simpl in progDenote (compile (Const 42)) nil.
+Eval simpl in progDenote (compile (Binop Plus (Const 2) (Const 2))) nil.
+Eval simpl in progDenote (compile (Binop Times (Binop Plus (Const 2) (Const 2)) (Const 7))) nil.
