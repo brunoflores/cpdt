@@ -122,15 +122,35 @@ Eval simpl in tprogDenote (tcompile (TBinop TLt (TBinop TPlus (TNConst 2) (TNCon
 
 (* Show translation correctness. *)
 
-Lemma compile_correct' : forall e p s, progDenote (compile e ++ p) s = progDenote p (expDenote e :: s).
+(* Strategy: In addition to the source expression and its type,
+   we quantify over an initial stack type and a stack compatible with it.
+   Running the compilation of the program starting from that stack,
+   we should arrive at a stack that differs only in having the program's
+   denotation pushed onto it. *)
+Lemma tcompile_correct' : forall t (e : texp t) ts (s : vstack ts),
+    tprogDenote (tcompile e ts) s = (texpDenote e, s).
+Abort.
+
+(* Analogue to the [app_assoc_reverse]. *)
+Lemma tconcat_corret : forall ts ts' ts'' (p : tprog ts ts') (p' : tprog ts' ts'') (s : vstack ts),
+    tprogDenote (tconcat p p') s = tprogDenote p' (tprogDenote p s).
 Proof.
-  induction e;
-    crush.
+  induction p; crush.
 Qed.
 
-Theorem compile_correct : forall e, progDenote (compile e) nil = Some (expDenote e :: nil).
-  intros e;
-    rewrite (app_nil_end (compile e));
-    rewrite compile_correct';
-    reflexivity.
+(* Register lemma to be used by the brute-force script. *)
+Hint Rewrite tconcat_corret.
+
+Lemma tcompile_correct' : forall t (e : texp t) ts (s : vstack ts),
+    tprogDenote (tcompile e ts) s = (texpDenote e, s).
+Proof.
+  induction e; crush.
+Qed.
+
+Hint Rewrite tcompile_correct'.
+
+Theorem tcompile_correct : forall t (e : texp t),
+    tprogDenote (tcompile e nil) tt = (texpDenote e, tt).
+Proof.
+  crush.
 Qed.
