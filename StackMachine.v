@@ -33,21 +33,15 @@ Definition tbinopDenote arg1 arg2 res (b : tbinop arg1 arg2 res)
 
 (* Our type of arithmetic expressions. *)
 Inductive texp : type -> Set :=
-  | TNConst : nat -> texp Nat
-  | TBConst : bool -> texp Bool
-  | TBinop : forall t1 t2 t, tbinop t1 t2 t -> texp t1 -> texp t2 -> texp t.
+| TNConst : nat -> texp Nat
+| TBConst : bool -> texp Bool
+| TBinop : forall t1 t2 t, tbinop t1 t2 t -> texp t1 -> texp t2 -> texp t.
 
-(* What the programs mean. *)
-Definition binopDenote (b : binop) : nat -> nat -> nat :=
-  match b with
-  | Plus => plus
-  | Times => mult
-  end.
-
-Fixpoint expDenote (e : exp) : nat :=
+Fixpoint texpDenote t (e : texp t) : typeDenote t :=
   match e with
-  | Const n => n
-  | Binop b e1 e2 => (binopDenote b) (expDenote e1) (expDenote e2)
+  | TNConst n => n
+  | TBConst b => b
+  | TBinop _ _ _ b e1 e2 => (tbinopDenote b) (texpDenote e1) (texpDenote e2)
   end.
 
 Eval simpl in expDenote (Const 42).
