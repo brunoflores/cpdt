@@ -27,7 +27,7 @@ jobs:
 
       - name: Build Coq
         run: |
-          apt-get install -y opam m4
+          sudo apt-get install -y opam m4
           opam init
           eval $(opam env)
           opam pin add coq 8.13.1
