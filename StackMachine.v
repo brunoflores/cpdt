@@ -65,12 +65,6 @@ Inductive tinstr : tstack -> tstack -> Set :=
 | TiBinop : forall arg1 arg2 res s,
     tbinop arg1 arg2 res -> tinstr (arg1 :: arg2 :: s) (res :: s).
 
-(* Syntax of the stack machine. *)
-
-Inductive instr : Set :=
-| iConst : nat -> instr
-| iBinop : binop -> instr.
-
 Definition prog := list instr.
 Definition stack := list nat.
 
