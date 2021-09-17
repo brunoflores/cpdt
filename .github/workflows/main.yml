@@ -17,8 +17,9 @@ jobs:
     container: coqorg/coq:8.13
 
     steps:
+      - uses: actions/checkout@v2
+
       - name: Prove all
-        uses: actions/checkout@v2
         run: |
           eval $(opam env)
           coqc -R lib Lib StackMachine.v
