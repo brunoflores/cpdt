@@ -88,6 +88,12 @@ Definition tinstrDenote ts ts' (i : tinstr ts ts') : vstack ts -> vstack ts' :=
                            ((tbinopDenote b) arg1 arg2, s')
   end.
 
+Fixpoint tprogDenote ts ts' (p : tprog ts ts') : vstack ts -> vstack ts' :=
+  match p with
+  | TNil _ => fun s => s
+  | TCons _ _ _ i p' => fun s => tprogDenote p' (tinstrDenote i s)
+  end.
+
 (* ---------- Compiler definition ------------- *)
 
 (* Translation. *)
