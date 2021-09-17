@@ -98,10 +98,18 @@ Fixpoint tprogDenote ts ts' (p : tprog ts ts') : vstack ts -> vstack ts' :=
 
 (* Translation. *)
 
-Fixpoint compile (e : exp) : prog :=
+(* Helper for concatenating two stack machine programs. *)
+Fixpoint tconcat ts ts' ts'' (p : tprog ts ts') : tprog ts' ts'' -> tprog ts ts'' :=
+  match p with
+  | TNil _ => fun p' => p'
+  | TCons _ _ _ i p1 => fun p' => TCons i (tconcat p1 p')
+  end.
+
+Fixpoint tcompile t (e : texp t) (ts : tstack) : tprog ts (t :: ts) :=
   match e with
-  | Const n => iConst n :: nil
-  | Binop b e1 e2 => compile e2 ++ compile e1 ++ iBinop b :: nil
+  | TNConst n => TCons (TiNConst _ n) (TNil _)
+  | TBConst b => TCons (TiBConst _ b) (TNil _)
+  | TBinop _ _ _ b e1 e2 => tconcat (tcompile e2 _) (tconcat (tcompile e1 _) (TCons (TiBinop _ b) (TNil _)))
   end.
 
 Eval simpl in compile (Const 42).
