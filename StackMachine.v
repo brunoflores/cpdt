@@ -65,7 +65,13 @@ Inductive tinstr : tstack -> tstack -> Set :=
 | TiBinop : forall arg1 arg2 res s,
     tbinop arg1 arg2 res -> tinstr (arg1 :: arg2 :: s) (res :: s).
 
-Definition prog := list instr.
+(* Stack machine programs must guarantee that intermediate stack types
+   match within a program. *)
+Inductive tprog : tstack -> tstack -> Set :=
+| TNil : forall s, tprog s s
+| TCons : forall s1 s2 s3,
+    tinstr s1 s2 -> tprog s2 s3 -> tprog s1 s3.
+
 Definition stack := list nat.
 
 (* An instruction either pushes a constant onto the stack or pops two arguments,
