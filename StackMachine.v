@@ -53,6 +53,18 @@ Eval simpl in texpDenote (TBinop TLt (TBinop TPlus (TNConst 2) (TNConst 2)) (TNC
 
 (* ---------- Target language of our compiler ------------- *)
 
+(* Stack types classify sets of possible stacks. *)
+Definition tstack := list type.
+
+(* Instructions in terms of stack types.
+   Every instruction's type tells what initial stack type it expects and
+   what final stack type it will produce. *)
+Inductive tinstr : tstack -> tstack -> Set :=
+| TiNConst : forall s, nat -> tinstr s (Nat :: s)
+| TiBConst : forall s, bool -> tinstr s (Bool :: s)
+| TiBinop : forall arg1 arg2 res s,
+    tbinop arg1 arg2 res -> tinstr (arg1 :: arg2 :: s) (res :: s).
+
 (* Syntax of the stack machine. *)
 
 Inductive instr : Set :=
