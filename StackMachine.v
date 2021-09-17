@@ -4,14 +4,20 @@ Set Asymmetric Patterns.
 
 (* ---------- Source language of our compiler ------------- *)
 
+Inductive type : Set := Nat | Bool.
+
 (* Syntax of the source language. *)
-Inductive binop : Set := Plus | Times.
-(* Use Set to signal as a constituent of programs. *)
+Inductive tbinop : type -> type -> type -> Set :=
+| TPlus : tbinop Nat Nat Nat
+| TTimes : tbinop Nat Nat Nat
+| TEq : forall t, tbinop t t Bool (* Polymorphism: allow equality of any two values of any type, as long as they have the same type. *)
+| TLt : tbinop Nat Nat Bool.
 
 (* Our type of arithmetic expressions. *)
-Inductive exp : Set :=
-| Const : nat -> exp
-| Binop : binop -> exp -> exp -> exp.
+Inductive texp : type -> Set :=
+  | TNConst : nat -> texp Nat
+  | TBConst : bool -> texp Bool
+  | TBinop : forall t1 t2 t, tbinop t1 t2 t -> texp t1 -> texp t2 -> texp t.
 
 (* What the programs mean. *)
 Definition binopDenote (b : binop) : nat -> nat -> nat :=
