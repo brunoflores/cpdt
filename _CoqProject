@@ -1,2 +1,3 @@
 -R lib Lib
+lib/CpdtTactics.v
 StackMachine.v
