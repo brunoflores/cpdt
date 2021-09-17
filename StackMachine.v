@@ -112,15 +112,13 @@ Fixpoint tcompile t (e : texp t) (ts : tstack) : tprog ts (t :: ts) :=
   | TBinop _ _ _ b e1 e2 => tconcat (tcompile e2 _) (tconcat (tcompile e1 _) (TCons (TiBinop _ b) (TNil _)))
   end.
 
-Eval simpl in compile (Const 42).
-Eval simpl in compile (Binop Plus (Const 2) (Const 2)).
-Eval simpl in compile (Binop Times (Binop Plus (Const 2) (Const 2)) (Const 7)).
-
 (* Run some compiled programs. *)
 
-Eval simpl in progDenote (compile (Const 42)) nil.
-Eval simpl in progDenote (compile (Binop Plus (Const 2) (Const 2))) nil.
-Eval simpl in progDenote (compile (Binop Times (Binop Plus (Const 2) (Const 2)) (Const 7))) nil.
+Eval simpl in tprogDenote (tcompile (TNConst 42) nil) tt.
+Eval simpl in tprogDenote (tcompile (TBConst true) nil) tt.
+Eval simpl in tprogDenote (tcompile (TBinop TTimes (TBinop TPlus (TNConst 2) (TNConst 2)) (TNConst 7)) nil) tt.
+Eval simpl in tprogDenote (tcompile (TBinop (TEq Nat) (TBinop TPlus (TNConst 2) (TNConst 2)) (TNConst 7)) nil) tt.
+Eval simpl in tprogDenote (tcompile (TBinop TLt (TBinop TPlus (TNConst 2) (TNConst 2)) (TNConst 7)) nil) tt.
 
 (* Show translation correctness. *)
 
