@@ -79,27 +79,13 @@ Fixpoint vstack (ts : tstack) : Set :=
   | t :: ts' => typeDenote t * vstack ts'
   end%type.
 
-(* An instruction either pushes a constant onto the stack or pops two arguments,
-   applies a binary operator to them, and pushes the result onto the stack. *)
-Definition instrDenote (i : instr) (s : stack) : option stack :=
+Definition tinstrDenote ts ts' (i : tinstr ts ts') : vstack ts -> vstack ts' :=
   match i with
-  | iConst n => Some (n :: s)
-  | iBinop b =>
-    match s with
-    | arg1 :: arg2 :: s' => Some ((binopDenote b) arg1 arg2 :: s')
-    | _ => None
-    end
-  end.
-
-(* Iterates application of [instrDenote] through a whole program. *)
-Fixpoint progDenote (p : prog) (s : stack) : option stack :=
-  match p with
-  | nil => Some s
-  | i :: p' =>
-    match instrDenote i s with
-    | None => None
-    | Some s' => progDenote p' s'
-    end
+  | TiNConst _ n => fun s => (n ,s)
+  | TiBConst _ b => fun s => (b, s)
+  | TiBinop _ _ _ _ b => fun s =>
+                           let '(arg1, (arg2, s')) := s in
+                           ((tbinopDenote b) arg1 arg2, s')
   end.
 
 (* ---------- Compiler definition ------------- *)
