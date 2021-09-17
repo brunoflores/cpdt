@@ -1,12 +1,12 @@
-name: CI
+name: Docker CI
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [ master ]
+    branches:
+      - master
   pull_request:
-    branches: [ master ]
+    branches:
+      - '**'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -15,13 +15,29 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: coqorg/coq:8.13
-      options: --user root
+
+    strategy:
+      matrix:
+          # Browse URL: https://github.com/coq-community/docker-coq/wiki#supported-tags
+          # to get the list of supported (coq, ocaml) versions in coqorg/coq.
+          coq_version:
+            - '8.13'
+            - 'dev'
+          ocaml_version:
+            - '4.07-flambda'
+            - '4.11-flambda'
+      max-parallel: 4
+      # Don't cancel all in-progress jobs if one matrix job fails:
+      fail-fast: false
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Prove all
-        run: |
-          coqc -R lib Lib StackMachine.v
+      - uses: coq-community/docker-coq-action@v1
+        with:
+          opam_file: 'cpdt.opam'
+          coq_version: ${{ matrix.coq_version }}
+          ocaml_version: ${{ matrix.ocaml_version }}
+          export: 'OPAMWITHTEST'
+        env:
+          OPAMWITHTEST: 'true'
