@@ -6,12 +6,30 @@ Set Asymmetric Patterns.
 
 Inductive type : Set := Nat | Bool.
 
+(* Map types of object language to Coq types. *)
+Definition typeDenote (t : type) : Set :=
+  match t with
+  | Nat => nat
+  | Bool => bool
+  end.
+
 (* Syntax of the source language. *)
 Inductive tbinop : type -> type -> type -> Set :=
 | TPlus : tbinop Nat Nat Nat
 | TTimes : tbinop Nat Nat Nat
 | TEq : forall t, tbinop t t Bool (* Polymorphism: allow equality of any two values of any type, as long as they have the same type. *)
 | TLt : tbinop Nat Nat Bool.
+
+(* Interpret with standard library. *)
+Definition tbinopDenote arg1 arg2 res (b : tbinop arg1 arg2 res)
+  : typeDenote arg1 -> typeDenote arg2 -> typeDenote res :=
+  match b with
+  | TPlus => plus
+  | TTimes => mult
+  | TEq Nat => beq_nat
+  | TEq Bool => eqb
+  | TLt => leb
+  end.
 
 (* Our type of arithmetic expressions. *)
 Inductive texp : type -> Set :=
