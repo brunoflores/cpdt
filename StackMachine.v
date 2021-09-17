@@ -72,7 +72,12 @@ Inductive tprog : tstack -> tstack -> Set :=
 | TCons : forall s1 s2 s3,
     tinstr s1 s2 -> tprog s2 s3 -> tprog s1 s3.
 
-Definition stack := list nat.
+(* Value stacks at runtime. *)
+Fixpoint vstack (ts : tstack) : Set :=
+  match ts with
+  | nil => unit
+  | t :: ts' => typeDenote t * vstack ts'
+  end%type.
 
 (* An instruction either pushes a constant onto the stack or pops two arguments,
    applies a binary operator to them, and pushes the result onto the stack. *)
