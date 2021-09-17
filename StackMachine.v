@@ -88,5 +88,13 @@ Eval simpl in progDenote (compile (Binop Times (Binop Plus (Const 2) (Const 2)) 
 
 Lemma compile_correct' : forall e p s, progDenote (compile e ++ p) s = progDenote p (expDenote e :: s).
 Proof.
-  induction e; crush.
+  induction e;
+    crush.
+Qed.
+
+Theorem compile_correct : forall e, progDenote (compile e) nil = Some (expDenote e :: nil).
+  intros e;
+    rewrite (app_nil_end (compile e));
+    rewrite compile_correct';
+    reflexivity.
 Qed.
