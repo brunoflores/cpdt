@@ -31,4 +31,5 @@ jobs:
 
       - name: Prove all
         run: |
+          eval $(opam env)
           coqc -R lib Lib StackMachine.v
