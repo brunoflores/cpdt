@@ -44,9 +44,12 @@ Fixpoint texpDenote t (e : texp t) : typeDenote t :=
   | TBinop _ _ _ b e1 e2 => (tbinopDenote b) (texpDenote e1) (texpDenote e2)
   end.
 
-Eval simpl in expDenote (Const 42).
-Eval simpl in expDenote (Binop Plus (Const 2) (Const 2)).
-Eval simpl in expDenote (Binop Times (Binop Plus (Const 2) (Const 2)) (Const 7)).
+(* Evaluate examples. *)
+Eval simpl in texpDenote (TNConst 41).
+Eval simpl in texpDenote (TBConst true).
+Eval simpl in texpDenote (TBinop TTimes (TBinop TPlus (TNConst 2) (TNConst 2)) (TNConst 7)).
+Eval simpl in texpDenote (TBinop (TEq Nat) (TBinop TPlus (TNConst 2) (TNConst 2)) (TNConst 7)).
+Eval simpl in texpDenote (TBinop TLt (TBinop TPlus (TNConst 2) (TNConst 2)) (TNConst 7)).
 
 (* ---------- Target language of our compiler ------------- *)
 
