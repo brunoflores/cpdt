@@ -83,3 +83,36 @@ Eval simpl in compile (Binop Times (Binop Plus (Const 2) (Const 2)) (Const 7)).
 Eval simpl in progDenote (compile (Const 42)) nil.
 Eval simpl in progDenote (compile (Binop Plus (Const 2) (Const 2))) nil.
 Eval simpl in progDenote (compile (Binop Times (Binop Plus (Const 2) (Const 2)) (Const 7))) nil.
+
+(* Show translation correctness. *)
+
+Theorem compile_correct : forall e, progDenote (compile e) nil = Some (expDenote e :: nil).
+Abort.
+
+Lemma compile_correct' : forall e p s, progDenote (compile e ++ p) s = progDenote p (expDenote e :: s).
+Proof.
+  induction e.
+  intros.
+  unfold expDenote.
+  unfold progDenote at 1.
+  simpl.
+  fold progDenote.
+  reflexivity.
+  intros.
+  unfold compile.
+  fold compile.
+  unfold expDenote.
+  fold expDenote.
+  rewrite app_assoc_reverse.
+  rewrite IHe2.
+  rewrite app_assoc_reverse.
+  rewrite IHe1.
+  unfold progDenote at 1.
+  simpl.
+  fold progDenote.
+  reflexivity.
+Qed.
+
+(* Handy search commands. *)
+Check app_assoc_reverse.
+SearchRewrite ((_ ++ _) ++ _).
